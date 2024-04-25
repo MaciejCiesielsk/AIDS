@@ -1,6 +1,7 @@
 import random
 import os
 import argparse
+import math
 
 parser = argparse.ArgumentParser()
 parser.add_argument("-avl", action="store_true", help="Work on AVL tree")
@@ -25,11 +26,6 @@ class BST:
     def __init__(self):
         self.root = None
 
-    def insert2(self, key):
-        if not self.root:
-           self.root = TreeNode(key)
-        else:
-            self.insert(self.root, key)
 
     def insert(self, node, key):
         if not node:
@@ -52,7 +48,7 @@ class BST:
             return None
         while node.left:
             node = node.left
-        return node.key
+        return node
         
     def inorder_traversal(self, node):
         if node:
@@ -104,6 +100,58 @@ class BST:
 
         return node
     
+    def rotate_right(self, root):
+        if self.height() < 1:
+            return root
+        new_root = root.left
+        root.left = new_root.right
+        new_root.right = root
+        root = new_root
+        return root
+
+
+
+    def vine(self, root):
+        tail = root
+        rest = tail.right
+        while rest:
+            if not rest.left:
+                tail = rest
+                rest = rest.right
+            else:
+                #jak nie jest po lewej stronie to rotacja
+                temp = rest.left
+                rest.left = temp.right
+                temp.right = rest
+                rest = temp
+                tail.right = temp
+        return root
+    
+    def height_recursive(self, root):
+        if not root:
+            return 0
+        return 1 + self.height_recursive(root.left) + self.height_recursive(root.right)
+    
+
+    def height(self):
+        return self.height_recursive(self.root)
+
+    def balance(self):
+            n = self.height()
+            m = 2 ** (int(math.log2(n + 1))) - 1
+
+            self.rotate_right(m)
+
+            while m > 1:
+                m = m // 2
+                self.rotate_right(m)
+    
+    def dsw(self):
+        self.vine(self.root)
+        self.balance()
+
+    
+
 
 #AVL
 
@@ -125,10 +173,10 @@ class AVL:
 
     def rotate_left(self, x):
         y = x.right
-        turn = y.left
+        temp = y.left
 
         y.left = x
-        x.right = turn
+        x.right = temp
 
         x.height = 1 + max(self.height(x.left), self.height(x.right))
         y.height = 1 + max(self.height(y.left), self.height(y.right))
@@ -137,10 +185,10 @@ class AVL:
 
     def rotate_right(self, y):
         x = y.left
-        turn = x.right
+        temp = x.right
 
         x.right = y
-        y.left = turn
+        y.left = temp
 
         y.height = 1 + max(self.height(y.left), self.height(y.right))
         x.height = 1 + max(self.height(x.left), self.height(x.right))
@@ -387,7 +435,8 @@ def chosenTree(treeName, tree, root):
 
 
         elif command == 'rebalance':
-            print("Do zrobienia")
+            print(f"{treeName} tree has been rebalanced.")
+            root = tree.dsw()
         elif command == 'remove':
             keys = list(map(int, input('remove> ').split()))
             for key in keys:
