@@ -93,12 +93,12 @@ class BST:
             node.right = self.delete(node.right, temp.key)
 
         return node
-    
     def insert_key(self, key):
         self.root = self.insert(self.root, key)
 
     def remove_key(self, key):
         self.root = self.delete(self.root, key)
+
 
     def remove(self, node, key):
         if not node:
@@ -165,6 +165,7 @@ class AVL:
         x.height = 1 + max(self.height(x.left), self.height(x.right))
 
         return x
+    
     def insert_sorted(self, keys, start, end):
         if start>end:
             return None
@@ -206,9 +207,6 @@ class AVL:
             return self.rotate_left(node)
 
         return node
-
-    def insert_key(self, key):
-        self.root = self.insert(self.root, key)
 
 
 
@@ -270,17 +268,12 @@ class AVL:
 
     def remove_key(self, key):
         self.root = self.remove(self.root, key)
-
     
     def build_AVL(self,keys):
         keys.sort()
         self.root = self.insert_sorted(keys,0,len(keys)-1)
 
-    def inorder_traversal(self, node):
-        if node:
-            self.inorder_traversal(node.left)
-            print(node.key, end=" ")
-            self.inorder_traversal(node.right)
+
     
     def find_max(self, node):
         if not node:
@@ -295,7 +288,13 @@ class AVL:
         while node.left:
             node = node.left
         return node.key
-    
+        
+        
+    def inorder_traversal(self, node):
+        if node:
+            self.inorder_traversal(node.left)
+            print(node.key, end=" ")
+            self.inorder_traversal(node.right)
     def postorder_traversal(self, node):
         if node:
             self.postorder_traversal(node.left)
@@ -350,15 +349,17 @@ def tikz_file(filename, text):
         file.write("\\end{tikzpicture}\n")
         file.write("\\end{document}\n")
     file.close()
+
+
 def build_tree(node):
     result, _ = tikz_guide(node)
     return result
 
 
-
-
 def chosenTree(treeName, tree, root):
     treeName = treeName.upper()
+    print(f"--- {treeName} Tree ---")
+    print("Type Help for commands")
     while True:
         command = input('command> ').lower()
         print(command)
@@ -367,9 +368,10 @@ def chosenTree(treeName, tree, root):
             print("Commands:")
             print("Help - display this message")
             print("Exit - exit the program")
-            print("Print - print the trees")
+            print("Print - print the trees using Pre-Order, In-Order and Post-Order traversals")
             print("Insert - insert a node into the trees")
             print("Delete - delete all nodes from the trees")
+            print("Export - save the tree to a txt file")
             print("Rebalance - rebalance the AVL tree")
             print("Remove - remove a node from the trees")
             print("MinMax - find the minimum and maximum values in the trees")
@@ -383,18 +385,18 @@ def chosenTree(treeName, tree, root):
 
         if command == "print":
             print(treeName, " tree:")
-            print("In-order:", end=" ")
+            print("\nPre-order:", end=" ")
+            tree.preorder_traversal(root)
+            print("\nIn-order:", end=" ")
             tree.inorder_traversal(root)
             print("\nPost-order:", end=" ")
             tree.postorder_traversal(root)
-            print("\nPre-order:", end=" ")
-            tree.preorder_traversal(root)
             print("")
 
 
-        elif command == "tickz":
+        elif command == "export":
             print(f"{treeName} tree has been saved to a txt file:")
-            tikz_file(os.path.join(CURRENT_DIR, f"tickzpicture{treeName}.txt"), build_tree(root))
+            tikz_file(os.path.join(CURRENT_DIR, f"tikzpicture{treeName}.txt"), build_tree(root))
 
 
         elif command == 'insert':
@@ -424,7 +426,7 @@ def chosenTree(treeName, tree, root):
 
 
         else:
-            print("Unknown command. Please try again. Type help for more information.")
+            print("Unknown command. Type help for more information.")
 
 
 
