@@ -237,18 +237,16 @@ class AVL:
                 temp = node.left
                 node = None
                 return temp
-            temp = self.find_min_key_node(node.right)
-            node.key = temp.key
-            node.right = self.remove(node.right, temp.key)
-        
-        if not node:
-            return node
+            else:
+                temp = self.find_min(node.right)
+                node.key = temp.key
+                node.right = self.remove(node.right, temp.key)
+            if not node:
+                return node
         
         node.height = 1 + max(self.height(node.left), self.height(node.right))
 
         balance = self.balance(node)
-
-        # Wyważanie drzewa po usunięciu węzła
 
         # LL rotation
         if balance > 1 and self.balance(node.left) >= 0:
@@ -312,6 +310,51 @@ class AVL:
             self.preorder_traversal(node.right)
 
 
+def tikz_guide(node, level=0, pos=0):
+    global positions
+    if positions is None:
+        positions = {}
+    if node is None:
+        return "", pos
+    while(pos,-level) in positions:
+        pos += 1
+    positions[(pos,-level)]=node.key
+    result="\\node at ({},{}) {{{}}};\n".format(pos,-level,node.key)
+    if node.left is not None:
+        left_result, left_pos = tikz_guide(node.left,level+1,pos-1)
+        result+=left_result
+        result+="\\draw ({},{}) -- ({},{});\n".format(pos,-level,pos-1,-level-1)
+    if node.right is not None:
+        right_result, right_pos = tikz_guide(node.right,level+1,pos+1)
+        result+=right_result
+        result+="\\draw ({},{}) -- ({},{});\n".format(pos,-level,pos+1,-level-1)
+    return result, pos  
+
+
+def tikz_file(filename, text):
+    with open(filename, 'w') as file:
+        file.write("\\documentclass{standalone}\n")
+        file.write("\\usepackage{tikz}\n")
+        file.write("\\begin{document}\n")
+        file.write("\\begin{tikzpicture}[\n")
+        file.write("level distance=1cm,\n")
+        file.write("level 1/.style={sibling distance=3cm},\n")
+        file.write("level 2/.style={sibling distance=1.5cm},\n")
+        file.write("level 3/.style={sibling distance=1cm}\n")
+        file.write("]\n")
+    file.close()
+    with open(filename, 'a') as file:
+        file.write(text)
+    file.close()
+    with open(filename, 'a') as file:
+        file.write("\\end{tikzpicture}\n")
+        file.write("\\end{document}\n")
+    file.close()
+def build_tree(node):
+    result, _ = tikz_guide(node)
+    return result
+
+
 
 
 def chosenTree(treeName, tree, root):
@@ -330,11 +373,14 @@ def chosenTree(treeName, tree, root):
             print("Rebalance - rebalance the AVL tree")
             print("Remove - remove a node from the trees")
             print("MinMax - find the minimum and maximum values in the trees")
-            print("SortAndMedian - sort the trees and find the median")
             print("-------------")
             continue
+
+
         if command == 'exit':
             break
+
+
         if command == "print":
             print(treeName, " tree:")
             print("In-order:", end=" ")
@@ -344,33 +390,44 @@ def chosenTree(treeName, tree, root):
             print("\nPre-order:", end=" ")
             tree.preorder_traversal(root)
             print("")
+
+
         elif command == "tickz":
-            print("Do zrobienia")
+            print(f"{treeName} tree has been saved to a txt file:")
+            tikz_file(os.path.join(CURRENT_DIR, f"tickzpicture{treeName}.txt"), build_tree(root))
+
+
         elif command == 'insert':
             num_nodes = int(input('nodes> '))
             keys = list(map(int, input('insert> ').split()))
             for key in keys:
                 root = tree.insert(root, key)
+
+
         elif command == 'delete':
             root = None
             print(f"All nodes have been deleted from the {treeName} tree.")
+
+
         elif command == 'rebalance':
             print("Do zrobienia")
         elif command == 'remove':
             keys = list(map(int, input('remove> ').split()))
             for key in keys:
                 root = tree.remove(root, key)
+
+
         elif command == 'minmax':
             minTree = tree.find_min(root)
             maxTree = tree.find_max(root)
             print(f"{treeName} tree: Min = {minTree}, Max = {maxTree}")
+
+
         else:
             print("Unknown command. Please try again. Type help for more information.")
 
 
-#2. OGARNAC GITA
-#4. RYSOWANIE DRZEWA W TICKZPICTURE
-#5. jebany rebalance
+
 
 def main():
     avl_tree = AVL()
