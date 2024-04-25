@@ -12,6 +12,7 @@ CURRENT_DIR = os.path.dirname(__file__)
 positions = {}
 
 
+
 #BST
 class TreeNode:
     def __init__(self, key):
@@ -71,26 +72,6 @@ class BST:
             self.preorder_traversal(node.left)
             self.preorder_traversal(node.right)
 
-    def delete(self, node, key):
-        if not node:
-            return node
-
-        if key < node.key:
-            node.left = self.delete(node.left, key)
-        elif key > node.key:
-            node.right = self.delete(node.right, key)
-        else:
-            if not node.left:
-                temp = node.right
-                node = None
-                return temp
-            elif not node.right:
-                temp = node.left
-                node = None
-                return temp
-            temp = self.find_min(node.right)
-            node.key = temp.key
-            node.right = self.delete(node.right, temp.key)
 
         return node
     def insert_key(self, key):
@@ -210,13 +191,7 @@ class AVL:
 
 
 
-    def delete(self, node):
-        if not node:
-            return
 
-        self.delete(node.left)
-        self.delete(node.right)
-        del node
 
     def remove(self, node, key):
         if not node:
@@ -361,10 +336,10 @@ def chosenTree(treeName, tree, root):
     print(f"--- {treeName} Tree ---")
     print("Type Help for commands")
     while True:
-        command = input('command> ').lower()
+        command = input('action> ').lower()
         print(command)
         if command == 'help':
-            print("--- Help ---")
+            print("Help".center(50, "-"))
             print("Commands:")
             print("Help - display this message")
             print("Exit - exit the program")
@@ -375,7 +350,7 @@ def chosenTree(treeName, tree, root):
             print("Rebalance - rebalance the AVL tree")
             print("Remove - remove a node from the trees")
             print("MinMax - find the minimum and maximum values in the trees")
-            print("-------------")
+            print("-".center(50, "-"))
             continue
 
 
@@ -441,6 +416,7 @@ def main():
         chosenTree("AVL", avl_tree, avl_root)
     if args.bst:
         chosenTree("BST", bst_tree, bst_root)
+
 
 if __name__ == "__main__":
     main()
